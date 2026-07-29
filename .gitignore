@@ -8,6 +8,8 @@ dist
 *.db-journal
 prisma/dev.db
 prisma/dev.db-journal
+prisma/deploy.db
+prisma/deploy.db-journal
 coverage
 .DS_Store
 *.log

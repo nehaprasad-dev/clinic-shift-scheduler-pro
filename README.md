@@ -38,17 +38,29 @@ npm test
 - `npm run db:reset` — wipe DB, remigrate, and reseed
 - `npm run db:seed` — reseed only
 
-## Deploy notes
+## Deploy notes (Vercel)
 
-The app uses SQLite by default (`DATABASE_URL=file:./dev.db`). Free hosts with ephemeral disks lose data on restart unless you:
+SQLite on Vercel needs a writable path. The production build:
 
-- bake a seeded database into the image, or
-- attach a persistent volume, or
-- point `DATABASE_URL` at Postgres and change `provider` in `prisma/schema.prisma`.
+1. Creates a seeded `prisma/deploy.db` during `npm run build`
+2. Copies it to `/tmp/clinic.db` at runtime (Vercel allows writes only under `/tmp`)
 
-Set `SESSION_SECRET` to a random string of at least 32 characters in production.
+### Vercel environment variables
 
-Cold starts on free tiers (Render / Fly) can take a few seconds on the first request after idle.
+Set these in Vercel → Project → Settings → Environment Variables:
+
+| Name | Value |
+|------|--------|
+| `SESSION_SECRET` | random string, 32+ characters |
+| `DATABASE_URL` | `file:./deploy.db` |
+
+Important: `DATABASE_URL` **must** start with `file:` because Prisma is configured for SQLite.
+
+Then redeploy.
+
+Note: data written at runtime (new claims, imports) lives in `/tmp` and can reset on cold starts. That is fine for this demo. README documents the cold-start behavior.
+
+Cold starts on free tiers can take a few seconds on the first request after idle.
 
 ## Project layout
 
