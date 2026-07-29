@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #14212b;
+  --ink-soft: #3d4f5f;
+  --paper: #f3f6f8;
+  --paper-2: #e7eef2;
+  --teal: #0f6e6a;
+  --teal-deep: #0a4f4c;
+  --teal-soft: #d7ecea;
+  --amber: #c47b2d;
+  --danger: #b42318;
+  --ok: #1f7a4d;
+  --line: #c9d6de;
+  --shadow: 0 18px 50px rgba(20, 33, 43, 0.08);
+}
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-teal: var(--teal);
+  --color-teal-deep: var(--teal-deep);
+  --color-teal-soft: var(--teal-soft);
+  --color-amber: var(--amber);
+  --color-danger: var(--danger);
+  --color-ok: var(--ok);
+  --color-line: var(--line);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #d9eceb 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #e8eef5 0%, transparent 50%),
+    linear-gradient(180deg, #f7fafb 0%, var(--paper) 40%, #eef3f6 100%);
+  background-attachment: fixed;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.shell {
+  width: min(1120px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(201, 214, 222, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+.status-full {
+  color: var(--ok);
+  background: #e8f6ee;
+}
+
+.status-partial {
+  color: #8a5a12;
+  background: #fff3df;
+}
+
+.status-empty {
+  color: var(--danger);
+  background: #fdeceb;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise {
+  animation: rise 420ms ease both;
+}
+
+.rise-delay-1 {
+  animation-delay: 80ms;
+}
+
+.rise-delay-2 {
+  animation-delay: 160ms;
+}
