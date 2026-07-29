@@ -5,6 +5,7 @@ import { AuthError, getSession, requireManager, requireUser } from "@/lib/auth";
 import { ClaimError, assignStaffToShift, unassignStaffFromShift, updateShiftWithClaimRevalidation } from "@/lib/claims";
 import { prisma } from "@/lib/db";
 import { importStaffFile, importShiftsFile } from "@/lib/import";
+import { assertCsvKind } from "@/lib/import/validate";
 import { loginWithPassword, logout } from "@/lib/login";
 import { parseClockToMinutes, resolveEndsNextDay } from "@/lib/time";
 import { dateKeyToUtc } from "@/lib/week";
@@ -175,6 +176,11 @@ export async function importCsvAction(
     }
 
     const content = await file.text();
+    const headerError = assertCsvKind(content, kind);
+    if (headerError) {
+      return { ok: false, message: headerError };
+    }
+
     if (kind === "staff") {
       const { result } = await importStaffFile(
         prisma,
@@ -184,7 +190,7 @@ export async function importCsvAction(
       );
       return {
         ok: true,
-        message: `Staff import finished: ${result.acceptedCount} accepted, ${result.rejectedCount} rejected, ${result.mergedCount} merged.`,
+        message: `Staff import finished: ${result.acceptedCount} accepted, ${result.rejectedCount} rejected, ${result.mergedCount} merged. See Import report for details.`,
       };
     }
 
@@ -196,7 +202,7 @@ export async function importCsvAction(
     );
     return {
       ok: true,
-      message: `Shifts import finished: ${result.acceptedCount} accepted, ${result.rejectedCount} rejected, ${result.mergedCount} merged.`,
+      message: `Shifts import finished: ${result.acceptedCount} accepted, ${result.rejectedCount} rejected, ${result.mergedCount} merged. See Import report for details.`,
     };
   } catch (error) {
     return toActionError(error);

@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { format } from "date-fns";
 import { AppHeader } from "@/components/AppHeader";
-import { AssignStaffForm, ShiftForm, shiftToFormValues } from "@/components/ShiftForms";
+import { AssignStaffForm, ShiftForm } from "@/components/ShiftForms";
 import { ClaimButton, DeleteShiftButton, UnassignButton } from "@/components/ShiftActions";
 import { getSession } from "@/lib/auth";
 import { computeCoverage, formatRequirements } from "@/lib/coverage";
 import { prisma } from "@/lib/db";
+import { shiftToFormValues } from "@/lib/shift-form";
 import { formatMinutes } from "@/lib/time";
-import { utcDateToKey } from "@/lib/week";
 
 export default async function ShiftDetailPage({
   params,
@@ -33,6 +34,7 @@ export default async function ShiftDetailPage({
   const coverage = computeCoverage(shift, shift.claims);
   const claimedByMe = shift.claims.some((c) => c.userId === user.id);
   const endLabel = `${formatMinutes(shift.endMinutes)}${shift.endsNextDay ? " next day" : ""}`;
+  const dateLabel = format(shift.date, "EEE d MMM yyyy");
 
   const staffOptions =
     user.appRole === "MANAGER"
@@ -50,36 +52,32 @@ export default async function ShiftDetailPage({
   return (
     <div>
       <AppHeader user={user} />
-      <main className="shell space-y-6 py-8">
-        <div className="rise">
-          <Link href="/shifts" className="text-sm font-medium text-[var(--teal)] hover:underline">
+      <main className="shell space-y-5 py-7 sm:py-9">
+        <div>
+          <Link href="/shifts" className="text-sm font-semibold text-[var(--teal)] hover:underline">
             ← Back to shifts
           </Link>
-          <h1
-            className="mt-2 text-3xl font-semibold text-[var(--teal-deep)]"
-            style={{ fontFamily: "var(--font-display), serif" }}
-          >
-            {utcDateToKey(shift.date)}
-          </h1>
-          <p className="mt-1 text-[var(--ink-soft)]">
+          <h1 className="page-title mt-2">{dateLabel}</h1>
+          <p className="page-sub">
             {formatMinutes(shift.startMinutes)} – {endLabel} · {formatRequirements(shift)}
           </p>
-          <p className="mt-2">
-            <span className={`rounded-md px-2 py-1 text-xs font-semibold uppercase status-${coverage.status}`}>
-              {coverage.status}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className={`badge badge-${coverage.status}`}>{coverage.status}</span>
+            <span className="text-sm text-[var(--ink-soft)]">
+              D {coverage.filled.doctors}/{coverage.required.doctors} · N{" "}
+              {coverage.filled.nurses}/{coverage.required.nurses} · R{" "}
+              {coverage.filled.receptionists}/{coverage.required.receptionists}
             </span>
-            {coverage.missing.length > 0 && (
-              <span className="ml-2 text-sm text-[var(--amber)]">
-                Missing: {coverage.missing.join(", ")}
-              </span>
-            )}
-          </p>
+          </div>
+          {coverage.missing.length > 0 && (
+            <p className="mt-2 text-sm font-medium text-[var(--amber)]">
+              Still need: {coverage.missing.join(", ")}
+            </p>
+          )}
         </div>
 
-        <section className="panel rise rise-delay-1 rounded-xl p-5">
-          <h2 className="mb-3 text-lg font-semibold" style={{ fontFamily: "var(--font-display), serif" }}>
-            Assigned staff
-          </h2>
+        <section className="panel rounded-2xl p-5">
+          <h2 className="mb-3 text-lg font-bold">Assigned staff</h2>
           {shift.claims.length === 0 ? (
             <p className="text-sm text-[var(--ink-soft)]">Nobody has claimed this shift yet.</p>
           ) : (
@@ -87,10 +85,10 @@ export default async function ShiftDetailPage({
               {shift.claims.map((claim) => (
                 <li
                   key={claim.id}
-                  className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--line)]/70 py-2 last:border-0"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[var(--paper)] px-3 py-2.5"
                 >
                   <div>
-                    <p className="font-medium">{claim.user.name}</p>
+                    <p className="font-semibold">{claim.user.name}</p>
                     <p className="text-sm text-[var(--ink-soft)]">
                       {claim.user.profession?.toLowerCase()} · {claim.user.email}
                     </p>
@@ -122,13 +120,11 @@ export default async function ShiftDetailPage({
 
         {user.appRole === "MANAGER" && (
           <>
-            <section className="panel rise rise-delay-2 rounded-xl p-5">
-              <h2 className="mb-3 text-lg font-semibold" style={{ fontFamily: "var(--font-display), serif" }}>
-                Edit shift
-              </h2>
+            <section className="panel rounded-2xl p-5">
+              <h2 className="mb-2 text-lg font-bold">Edit shift</h2>
               <p className="mb-4 text-sm text-[var(--ink-soft)]">
                 If you reduce capacity or change times, claims that no longer fit are removed
-                automatically and listed in the save confirmation.
+                automatically.
               </p>
               <ShiftForm
                 mode="edit"
@@ -136,7 +132,6 @@ export default async function ShiftDetailPage({
                 initialValues={shiftToFormValues(shift)}
               />
             </section>
-
             <DeleteShiftButton shiftId={shift.id} />
           </>
         )}

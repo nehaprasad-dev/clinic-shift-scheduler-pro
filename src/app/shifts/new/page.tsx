@@ -12,17 +12,12 @@ export default async function NewShiftPage() {
   return (
     <div>
       <AppHeader user={session.user} />
-      <main className="shell py-8">
-        <Link href="/shifts" className="text-sm font-medium text-[var(--teal)] hover:underline">
+      <main className="shell py-7 sm:py-9">
+        <Link href="/shifts" className="text-sm font-semibold text-[var(--teal)] hover:underline">
           ← Back to shifts
         </Link>
-        <h1
-          className="mt-2 mb-6 text-3xl font-semibold text-[var(--teal-deep)]"
-          style={{ fontFamily: "var(--font-display), serif" }}
-        >
-          New shift
-        </h1>
-        <section className="panel max-w-2xl rounded-xl p-5">
+        <h1 className="page-title mt-2 mb-5">New shift</h1>
+        <section className="panel max-w-2xl rounded-2xl p-5">
           <ShiftForm mode="create" />
         </section>
       </main>

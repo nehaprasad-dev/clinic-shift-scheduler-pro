@@ -17,7 +17,7 @@ export function LoginForm() {
           type="email"
           required
           autoComplete="username"
-          className="rounded-md border border-[var(--line)] bg-white px-3 py-2.5 outline-none ring-[var(--teal)] focus:ring-2"
+          className="field"
           placeholder="manager@clinicmail.test"
         />
       </label>
@@ -29,21 +29,17 @@ export function LoginForm() {
           type="password"
           required
           autoComplete="current-password"
-          className="rounded-md border border-[var(--line)] bg-white px-3 py-2.5 outline-none ring-[var(--teal)] focus:ring-2"
+          className="field"
         />
       </label>
 
       {state && !state.ok && (
-        <p className="rounded-md bg-[#fdeceb] px-3 py-2 text-sm text-[var(--danger)]">
+        <p className="rounded-xl bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
           {state.message}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-1 rounded-md bg-[var(--teal)] px-4 py-2.5 font-semibold text-white transition hover:bg-[var(--teal-deep)] disabled:opacity-60"
-      >
+      <button type="submit" disabled={pending} className="btn-primary mt-1">
         {pending ? "Signing in…" : "Sign in"}
       </button>
     </form>

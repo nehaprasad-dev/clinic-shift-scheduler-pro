@@ -7,25 +7,45 @@ export default async function LoginPage() {
   if (session.user) redirect("/shifts");
 
   return (
-    <main className="shell grid min-h-screen items-center gap-10 py-10 lg:grid-cols-[1.1fr_0.9fr]">
-      <section className="rise max-w-xl">
-        <p
-          className="text-4xl font-semibold leading-tight text-[var(--teal-deep)] sm:text-5xl"
-          style={{ fontFamily: "var(--font-display), serif" }}
-        >
-          Clinic Shift Scheduler
+    <main className="shell grid min-h-screen items-center gap-10 py-12 lg:grid-cols-2">
+      <section className="max-w-lg">
+        <p className="mb-4 inline-flex rounded-full border border-[var(--line)] bg-white px-2.5 py-1 text-xs font-medium text-[var(--ink-soft)]">
+          Clinic operations
         </p>
-        <p className="mt-4 max-w-md text-lg text-[var(--ink-soft)]">
-          Claim open shifts, see what roles are still missing, and keep the week covered.
+        <h1 className="page-title !text-4xl sm:!text-5xl">
+          Make clinic shift coverage easy to manage.
+        </h1>
+        <p className="page-sub !text-base">
+          Managers create shifts. Staff claim them. The coverage board shows exactly which roles
+          are still missing.
         </p>
+
+        <div className="mt-7 space-y-3">
+          <div className="panel rounded-2xl p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+              Manager
+            </p>
+            <p className="mt-1 text-sm font-medium">manager@clinicmail.test / manager123</p>
+          </div>
+          <div className="panel rounded-2xl p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+              Nurse
+            </p>
+            <p className="mt-1 text-sm font-medium">nurse@clinicmail.test / staff123</p>
+          </div>
+          <div className="panel rounded-2xl p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+              Doctor
+            </p>
+            <p className="mt-1 text-sm font-medium">doctor@clinicmail.test / staff123</p>
+          </div>
+        </div>
       </section>
 
-      <section className="panel rise rise-delay-1 rounded-2xl p-6 sm:p-8">
-        <h1 className="mb-1 text-2xl font-semibold" style={{ fontFamily: "var(--font-display), serif" }}>
-          Sign in
-        </h1>
-        <p className="mb-6 text-sm text-[var(--ink-soft)]">
-          Use a seeded manager or staff account from the README.
+      <section className="panel rounded-3xl p-6 sm:p-8">
+        <h2 className="text-2xl font-bold tracking-tight">Sign in</h2>
+        <p className="mb-6 mt-1 text-sm text-[var(--ink-soft)]">
+          Use a demo account. Best dates: August 2026.
         </p>
         <LoginForm />
       </section>

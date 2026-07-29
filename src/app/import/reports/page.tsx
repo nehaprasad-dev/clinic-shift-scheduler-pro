@@ -17,43 +17,42 @@ export default async function ImportReportsPage() {
   return (
     <div>
       <AppHeader user={session.user} />
-      <main className="shell py-8">
-        <h1
-          className="text-3xl font-semibold text-[var(--teal-deep)]"
-          style={{ fontFamily: "var(--font-display), serif" }}
-        >
-          Import report
-        </h1>
-        <p className="mt-1 mb-6 text-[var(--ink-soft)]">
+      <main className="shell py-7 sm:py-9">
+        <h1 className="page-title">Import reports</h1>
+        <p className="page-sub mb-6">
           Accepted, rejected, and merged rows from seed and uploaded CSV files.
         </p>
 
         <div className="space-y-3">
           {reports.length === 0 && (
-            <p className="panel rounded-xl p-5 text-[var(--ink-soft)]">No import reports yet.</p>
+            <p className="panel rounded-2xl p-6 text-sm text-[var(--ink-soft)]">
+              No import reports yet.
+            </p>
           )}
           {reports.map((report) => (
             <Link
               key={report.id}
               href={`/import/reports/${report.id}`}
-              className="panel block rounded-xl p-4 hover:border-[var(--teal)]"
+              className="panel block rounded-2xl p-4 transition hover:border-[var(--teal)] sm:p-5"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold" style={{ fontFamily: "var(--font-display), serif" }}>
-                    {report.filename}
-                  </p>
-                  <p className="text-sm text-[var(--ink-soft)]">
+                  <p className="text-base font-bold">{report.filename}</p>
+                  <p className="mt-1 text-sm text-[var(--ink-soft)]">
                     {report.source} · {format(report.createdAt, "d MMM yyyy HH:mm")}
                   </p>
                 </div>
-                <p className="text-sm">
-                  <span className="text-[var(--ok)]">{report.acceptedCount} accepted</span>
-                  {" · "}
-                  <span className="text-[var(--danger)]">{report.rejectedCount} rejected</span>
-                  {" · "}
-                  <span className="text-[var(--amber)]">{report.mergedCount} merged</span>
-                </p>
+                <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                  <span className="rounded-full bg-[var(--ok-soft)] px-2.5 py-1 text-[var(--ok)]">
+                    {report.acceptedCount} accepted
+                  </span>
+                  <span className="rounded-full bg-[var(--danger-soft)] px-2.5 py-1 text-[var(--danger)]">
+                    {report.rejectedCount} rejected
+                  </span>
+                  <span className="rounded-full bg-[var(--amber-soft)] px-2.5 py-1 text-[var(--amber)]">
+                    {report.mergedCount} merged
+                  </span>
+                </div>
               </div>
             </Link>
           ))}

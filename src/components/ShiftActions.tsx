@@ -29,11 +29,7 @@ export function ClaimButton({ shiftId, claimed }: { shiftId: string; claimed: bo
             else router.refresh();
           });
         }}
-        className={
-          claimed
-            ? "rounded-md border border-[var(--line)] bg-white px-3 py-2 text-sm font-semibold hover:bg-[var(--paper-2)] disabled:opacity-60"
-            : "rounded-md bg-[var(--teal)] px-3 py-2 text-sm font-semibold text-white hover:bg-[var(--teal-deep)] disabled:opacity-60"
-        }
+        className={claimed ? "btn-ghost" : "btn-primary"}
       >
         {pending ? "Working…" : claimed ? "Unclaim" : "Claim shift"}
       </button>
@@ -61,7 +57,7 @@ export function DeleteShiftButton({ shiftId }: { shiftId: string }) {
             else router.push("/shifts");
           });
         }}
-        className="rounded-md border border-[var(--danger)]/30 px-3 py-2 text-sm font-semibold text-[var(--danger)] hover:bg-[#fdeceb] disabled:opacity-60"
+        className="btn-ghost !border-[var(--danger)]/40 !text-[var(--danger)] hover:!bg-[var(--danger-soft)]"
       >
         {pending ? "Deleting…" : "Delete shift"}
       </button>
@@ -96,7 +92,7 @@ export function UnassignButton({
             else router.refresh();
           });
         }}
-        className="text-sm font-medium text-[var(--danger)] hover:underline disabled:opacity-60"
+        className="text-sm font-semibold text-[var(--danger)] hover:underline disabled:opacity-60"
       >
         {pending ? "Removing…" : `Remove ${name}`}
       </button>

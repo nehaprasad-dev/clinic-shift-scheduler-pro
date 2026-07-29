@@ -1,33 +1,35 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { importCsvAction, type ActionResult } from "@/app/actions";
 
 const initial: ActionResult | null = null;
 
 export function ImportForm({ kind }: { kind: "staff" | "shifts" }) {
   const [state, formAction, pending] = useActionState(importCsvAction, initial);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   return (
-    <form action={formAction} className="flex flex-col gap-3">
+    <form action={formAction} className="flex flex-col gap-4">
       <input type="hidden" name="kind" value={kind} />
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium text-[var(--ink-soft)]">
-          {kind === "staff" ? "Staff CSV" : "Shifts CSV"}
-        </span>
-        <input
-          type="file"
-          name="file"
-          accept=".csv,text/csv"
-          required
-          className="rounded-md border border-[var(--line)] bg-white px-3 py-2"
-        />
-      </label>
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-fit rounded-md bg-[var(--teal)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--teal-deep)] disabled:opacity-60"
-      >
+      <div className="relative">
+        <label className="file-drop">
+          <input
+            type="file"
+            name="file"
+            accept=".csv,text/csv"
+            required
+            onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
+          />
+          <span className="text-sm font-semibold text-[var(--ink)]">
+            {fileName ? fileName : "Choose CSV file"}
+          </span>
+          <span className="text-xs text-[var(--ink-soft)]">
+            {kind === "staff" ? "staff.csv" : "shifts.csv"} · click to browse
+          </span>
+        </label>
+      </div>
+      <button type="submit" disabled={pending} className="btn-primary w-fit">
         {pending ? "Importing…" : "Upload and import"}
       </button>
       {state && (

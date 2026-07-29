@@ -14,41 +14,34 @@ export default async function ImportPage() {
       <AppHeader user={session.user} />
       <main className="shell space-y-6 py-8">
         <div>
-          <h1
-            className="text-3xl font-semibold text-[var(--teal-deep)]"
-            style={{ fontFamily: "var(--font-display), serif" }}
-          >
-            Import CSV
-          </h1>
-          <p className="mt-1 max-w-2xl text-[var(--ink-soft)]">
-            Upload staff or shift exports using the same cleaning rules as the seed importer.
-            Results appear on the import report page.
+          <p className="mb-2 inline-flex rounded-full border border-[var(--line)] bg-white px-2.5 py-1 text-xs font-medium text-[var(--ink-soft)]">
+            Data import
+          </p>
+          <h1 className="page-title">Import CSV</h1>
+          <p className="page-sub">
+            Same cleaning rules as seed. Use the correct box — wrong file type is blocked.
           </p>
           <Link
             href="/import/reports"
-            className="mt-3 inline-block text-sm font-medium text-[var(--teal)] hover:underline"
+            className="mt-3 inline-block text-sm font-semibold underline-offset-2 hover:underline"
           >
             View import reports →
           </Link>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <section className="panel rounded-xl p-5">
-            <h2 className="mb-3 text-lg font-semibold" style={{ fontFamily: "var(--font-display), serif" }}>
-              Staff file
-            </h2>
-            <p className="mb-4 text-sm text-[var(--ink-soft)]">
-              Expected columns: staff_id, full_name, role, email
+          <section className="panel rounded-2xl p-5">
+            <h2 className="text-base font-bold">Staff file</h2>
+            <p className="mb-4 mt-1 text-sm text-[var(--ink-soft)]">
+              Columns: staff_id, full_name, role, email
             </p>
             <ImportForm kind="staff" />
           </section>
 
-          <section className="panel rounded-xl p-5">
-            <h2 className="mb-3 text-lg font-semibold" style={{ fontFamily: "var(--font-display), serif" }}>
-              Shifts file
-            </h2>
-            <p className="mb-4 text-sm text-[var(--ink-soft)]">
-              Expected columns: shift_id, date, start_time, end_time, requirements
+          <section className="panel rounded-2xl p-5">
+            <h2 className="text-base font-bold">Shifts file</h2>
+            <p className="mb-4 mt-1 text-sm text-[var(--ink-soft)]">
+              Columns: shift_id, date, start_time, end_time, requirements
             </p>
             <ImportForm kind="shifts" />
           </section>

@@ -30,21 +30,16 @@ export default async function ImportReportDetailPage({
   return (
     <div>
       <AppHeader user={session.user} />
-      <main className="shell space-y-6 py-8">
+      <main className="shell space-y-6 py-7 sm:py-9">
         <div>
           <Link
             href="/import/reports"
-            className="text-sm font-medium text-[var(--teal)] hover:underline"
+            className="text-sm font-semibold text-[var(--teal)] hover:underline"
           >
             ← All reports
           </Link>
-          <h1
-            className="mt-2 text-3xl font-semibold text-[var(--teal-deep)]"
-            style={{ fontFamily: "var(--font-display), serif" }}
-          >
-            {report.filename}
-          </h1>
-          <p className="mt-1 text-[var(--ink-soft)]">
+          <h1 className="page-title mt-2">{report.filename}</h1>
+          <p className="page-sub">
             {report.source} · {format(report.createdAt, "d MMM yyyy HH:mm")}
           </p>
         </div>
@@ -55,10 +50,8 @@ export default async function ImportReportDetailPage({
           <Stat label="Merged" value={report.mergedCount} tone="amber" />
         </div>
 
-        <section className="panel rounded-xl p-5">
-          <h2 className="mb-4 text-lg font-semibold" style={{ fontFamily: "var(--font-display), serif" }}>
-            Rejected and merged rows
-          </h2>
+        <section className="panel rounded-2xl p-5">
+          <h2 className="mb-4 text-lg font-bold">Rejected and merged rows</h2>
           {rejectedOrMerged.length === 0 ? (
             <p className="text-sm text-[var(--ink-soft)]">No rejected or merged rows.</p>
           ) : (
@@ -66,14 +59,14 @@ export default async function ImportReportDetailPage({
               {rejectedOrMerged.map((item) => (
                 <article
                   key={item.id}
-                  className="rounded-md border border-[var(--line)] bg-white/70 p-3"
+                  className="rounded-xl border border-[var(--line)] bg-[var(--paper)] p-3.5"
                 >
-                  <div className="mb-1 flex flex-wrap items-center gap-2 text-sm">
+                  <div className="mb-2 flex flex-wrap items-center gap-2 text-sm">
                     <span
-                      className={`rounded px-2 py-0.5 text-xs font-semibold uppercase ${
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-bold uppercase ${
                         item.kind === "rejected"
-                          ? "bg-[#fdeceb] text-[var(--danger)]"
-                          : "bg-[#fff3df] text-[var(--amber)]"
+                          ? "bg-[var(--danger-soft)] text-[var(--danger)]"
+                          : "bg-[var(--amber-soft)] text-[var(--amber)]"
                       }`}
                     >
                       {item.kind}
@@ -84,10 +77,10 @@ export default async function ImportReportDetailPage({
                     {item.rawRow}
                   </p>
                   <p className="mt-2 text-sm">
-                    <span className="font-medium">Issue:</span> {item.issue}
+                    <span className="font-semibold">Issue:</span> {item.issue}
                   </p>
                   <p className="text-sm">
-                    <span className="font-medium">Action:</span> {item.action}
+                    <span className="font-semibold">Action:</span> {item.action}
                   </p>
                 </article>
               ))}
@@ -108,18 +101,17 @@ function Stat({
   value: number;
   tone: "ok" | "danger" | "amber";
 }) {
-  const color =
+  const styles =
     tone === "ok"
-      ? "text-[var(--ok)]"
+      ? "text-[var(--ok)] bg-[var(--ok-soft)]"
       : tone === "danger"
-        ? "text-[var(--danger)]"
-        : "text-[var(--amber)]";
+        ? "text-[var(--danger)] bg-[var(--danger-soft)]"
+        : "text-[var(--amber)] bg-[var(--amber-soft)]";
+
   return (
-    <div className="panel rounded-xl p-4">
-      <p className="text-sm text-[var(--ink-soft)]">{label}</p>
-      <p className={`text-3xl font-semibold ${color}`} style={{ fontFamily: "var(--font-display), serif" }}>
-        {value}
-      </p>
+    <div className={`rounded-2xl p-4 ${styles}`}>
+      <p className="text-sm font-medium opacity-80">{label}</p>
+      <p className="text-3xl font-bold tracking-tight">{value}</p>
     </div>
   );
 }

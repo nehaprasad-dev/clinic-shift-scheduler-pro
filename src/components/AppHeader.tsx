@@ -1,35 +1,55 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { logoutAction } from "@/app/actions";
 import type { SessionUser } from "@/lib/auth";
 
 export function AppHeader({ user }: { user: SessionUser }) {
+  const pathname = usePathname();
   const isManager = user.appRole === "MANAGER";
 
   return (
-    <header className="border-b border-[var(--line)]/80 bg-white/55 backdrop-blur-md">
-      <div className="shell flex flex-wrap items-center justify-between gap-4 py-4">
-        <div>
-          <p
-            className="text-xl font-semibold tracking-tight text-[var(--teal-deep)]"
-            style={{ fontFamily: "var(--font-display), serif" }}
-          >
-            Clinic Shift Scheduler
-          </p>
-          <p className="text-sm text-[var(--ink-soft)]">
-            {user.name}
-            {user.profession ? ` · ${user.profession.toLowerCase()}` : " · manager"}
-          </p>
+    <header className="sticky top-0 z-20 border-b border-[var(--line)] bg-white/95 backdrop-blur">
+      <div className="shell flex h-[60px] items-center justify-between gap-6">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[var(--ink)] text-[10px] font-semibold tracking-wide text-white">
+            CS
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-[15px] font-semibold tracking-tight text-[var(--ink)]">
+              Clinic Shift Scheduler
+            </p>
+            <p className="truncate text-[12px] font-medium text-[var(--muted)]">
+              {user.name}
+              {user.profession ? ` · ${user.profession.toLowerCase()}` : " · manager"}
+            </p>
+          </div>
         </div>
 
-        <nav className="flex flex-wrap items-center gap-2 text-sm font-medium">
-          <NavLink href="/shifts">Shifts</NavLink>
-          {isManager && <NavLink href="/coverage">Coverage</NavLink>}
-          {isManager && <NavLink href="/import">Import</NavLink>}
-          {isManager && <NavLink href="/import/reports">Import report</NavLink>}
-          <form action={logoutAction}>
+        <nav className="flex flex-wrap items-center gap-1 text-[14px]">
+          <NavLink href="/shifts" pathname={pathname}>
+            Shifts
+          </NavLink>
+          {isManager && (
+            <NavLink href="/coverage" pathname={pathname}>
+              Coverage
+            </NavLink>
+          )}
+          {isManager && (
+            <NavLink href="/import" pathname={pathname} exact>
+              Import
+            </NavLink>
+          )}
+          {isManager && (
+            <NavLink href="/import/reports" pathname={pathname}>
+              Reports
+            </NavLink>
+          )}
+          <form action={logoutAction} className="ml-2">
             <button
               type="submit"
-              className="rounded-md px-3 py-2 text-[var(--ink-soft)] hover:bg-[var(--paper-2)]"
+              className="rounded-full border border-[var(--line)] px-3.5 py-1.5 text-[13px] font-medium text-[var(--ink)] hover:bg-[#f5f5f5]"
             >
               Sign out
             </button>
@@ -40,11 +60,30 @@ export function AppHeader({ user }: { user: SessionUser }) {
   );
 }
 
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({
+  href,
+  pathname,
+  children,
+  exact = false,
+}: {
+  href: string;
+  pathname: string;
+  children: React.ReactNode;
+  exact?: boolean;
+}) {
+  const active = exact
+    ? pathname === href
+    : pathname === href || pathname.startsWith(`${href}/`);
+
+  // Beside-style nav: active = dark text, inactive = muted. No black pill on links.
   return (
     <Link
       href={href}
-      className="rounded-md px-3 py-2 text-[var(--ink)] hover:bg-[var(--teal-soft)] hover:text-[var(--teal-deep)]"
+      className={
+        active
+          ? "rounded-full px-3 py-1.5 font-semibold text-[var(--ink)]"
+          : "rounded-full px-3 py-1.5 font-medium text-[var(--muted)] hover:text-[var(--ink)]"
+      }
     >
       {children}
     </Link>

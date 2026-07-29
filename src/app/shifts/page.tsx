@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { format } from "date-fns";
 import { AppHeader } from "@/components/AppHeader";
 import { ClaimButton } from "@/components/ShiftActions";
 import { getSession } from "@/lib/auth";
 import { computeCoverage, formatRequirements } from "@/lib/coverage";
 import { prisma } from "@/lib/db";
 import { formatMinutes } from "@/lib/time";
-import { utcDateToKey } from "@/lib/week";
 
 export default async function ShiftsPage({
   searchParams,
@@ -39,60 +39,42 @@ export default async function ShiftsPage({
       <AppHeader user={user} />
       <main className="shell py-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div className="rise">
-            <h1
-              className="text-3xl font-semibold text-[var(--teal-deep)]"
-              style={{ fontFamily: "var(--font-display), serif" }}
-            >
-              Shifts
-            </h1>
-            <p className="mt-1 text-[var(--ink-soft)]">
+          <div>
+            <p className="mb-2 inline-flex rounded-full border border-[var(--line)] bg-white px-2.5 py-1 text-xs font-medium text-[var(--ink-soft)]">
+              Schedule
+            </p>
+            <h1 className="page-title">Shifts</h1>
+            <p className="page-sub">
               {user.appRole === "MANAGER"
-                ? "Create shifts and assign staff directly."
-                : "Claim open shifts that match your profession."}
+                ? "Create shifts and assign staff. Seeded shifts start empty until claimed."
+                : "Claim open shifts that still need your profession."}
             </p>
           </div>
           {user.appRole === "MANAGER" && (
-            <Link
-              href="/shifts/new"
-              className="rounded-md bg-[var(--teal)] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[var(--teal-deep)]"
-            >
+            <Link href="/shifts/new" className="btn-primary">
               New shift
             </Link>
           )}
         </div>
 
-        <form className="panel rise rise-delay-1 mb-6 flex flex-wrap items-end gap-3 rounded-xl p-4">
-          <label className="flex flex-col gap-1 text-sm">
+        <form className="panel mb-5 flex flex-wrap items-end gap-3 rounded-2xl p-4">
+          <label className="flex min-w-[150px] flex-col gap-1.5 text-sm">
             <span className="font-medium text-[var(--ink-soft)]">From</span>
-            <input
-              type="date"
-              name="from"
-              defaultValue={from}
-              className="rounded-md border border-[var(--line)] bg-white px-3 py-2"
-            />
+            <input type="date" name="from" defaultValue={from} className="field" />
           </label>
-          <label className="flex flex-col gap-1 text-sm">
+          <label className="flex min-w-[150px] flex-col gap-1.5 text-sm">
             <span className="font-medium text-[var(--ink-soft)]">To</span>
-            <input
-              type="date"
-              name="to"
-              defaultValue={to}
-              className="rounded-md border border-[var(--line)] bg-white px-3 py-2"
-            />
+            <input type="date" name="to" defaultValue={to} className="field" />
           </label>
-          <button
-            type="submit"
-            className="rounded-md border border-[var(--line)] bg-white px-4 py-2 text-sm font-semibold hover:bg-[var(--paper-2)]"
-          >
+          <button type="submit" className="btn-ghost">
             Filter
           </button>
         </form>
 
-        <div className="rise rise-delay-2 space-y-3">
+        <div className="space-y-2.5">
           {shifts.length === 0 && (
-            <p className="panel rounded-xl p-6 text-[var(--ink-soft)]">
-              No shifts in this date range.
+            <p className="panel rounded-2xl p-6 text-sm text-[var(--ink-soft)]">
+              No shifts in this date range. Try August 2026.
             </p>
           )}
 
@@ -102,34 +84,51 @@ export default async function ShiftsPage({
             const endLabel = `${formatMinutes(shift.endMinutes)}${shift.endsNextDay ? " (+1)" : ""}`;
 
             return (
-              <article
-                key={shift.id}
-                className="panel grid gap-4 rounded-xl p-4 sm:grid-cols-[1fr_auto] sm:items-center"
-              >
+              <article key={shift.id} className="list-row">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
                       href={`/shifts/${shift.id}`}
-                      className="text-lg font-semibold hover:text-[var(--teal)]"
-                      style={{ fontFamily: "var(--font-display), serif" }}
+                      className="text-[15px] font-semibold tracking-tight hover:underline"
                     >
-                      {utcDateToKey(shift.date)}
+                      {format(shift.date, "EEE d MMM yyyy")}
                     </Link>
-                    <span
-                      className={`rounded-md px-2 py-0.5 text-xs font-semibold uppercase tracking-wide status-${coverage.status}`}
-                    >
-                      {coverage.status}
-                    </span>
+                    <span className={`badge badge-${coverage.status}`}>{coverage.status}</span>
                   </div>
+
                   <p className="mt-1 text-sm text-[var(--ink-soft)]">
-                    {formatMinutes(shift.startMinutes)} – {endLabel} · {formatRequirements(shift)}
+                    <span className="font-medium text-[var(--ink)]">
+                      {formatMinutes(shift.startMinutes)} – {endLabel}
+                    </span>
+                    <span className="mx-2 text-[var(--muted)]">·</span>
+                    {formatRequirements(shift)}
                   </p>
+
+                  <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+                    {coverage.required.doctors > 0 && (
+                      <span className="rounded-full bg-[#f3f4f6] px-2 py-1 text-[var(--ink-soft)]">
+                        Doctors {coverage.filled.doctors}/{coverage.required.doctors}
+                      </span>
+                    )}
+                    {coverage.required.nurses > 0 && (
+                      <span className="rounded-full bg-[#f3f4f6] px-2 py-1 text-[var(--ink-soft)]">
+                        Nurses {coverage.filled.nurses}/{coverage.required.nurses}
+                      </span>
+                    )}
+                    {coverage.required.receptionists > 0 && (
+                      <span className="rounded-full bg-[#f3f4f6] px-2 py-1 text-[var(--ink-soft)]">
+                        Reception {coverage.filled.receptionists}/
+                        {coverage.required.receptionists}
+                      </span>
+                    )}
+                  </div>
+
                   {coverage.missing.length > 0 ? (
-                    <p className="mt-1 text-sm text-[var(--amber)]">
-                      Missing: {coverage.missing.join(", ")}
+                    <p className="mt-2 text-sm text-[var(--amber)]">
+                      Still need: {coverage.missing.join(", ")}
                     </p>
                   ) : (
-                    <p className="mt-1 text-sm text-[var(--ok)]">Fully staffed</p>
+                    <p className="mt-2 text-sm text-[var(--ok)]">Fully staffed</p>
                   )}
                 </div>
 
@@ -137,10 +136,7 @@ export default async function ShiftsPage({
                   {user.appRole === "STAFF" && (
                     <ClaimButton shiftId={shift.id} claimed={claimedByMe} />
                   )}
-                  <Link
-                    href={`/shifts/${shift.id}`}
-                    className="rounded-md border border-[var(--line)] bg-white px-3 py-2 text-sm font-semibold hover:bg-[var(--paper-2)]"
-                  >
+                  <Link href={`/shifts/${shift.id}`} className="btn-ghost">
                     Details
                   </Link>
                 </div>

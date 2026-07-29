@@ -72,3 +72,11 @@ describe("parseCsv", () => {
     ]);
   });
 });
+
+describe("assertCsvKind", () => {
+  it("blocks shifts file in staff importer", async () => {
+    const { assertCsvKind } = await import("../import/validate");
+    const csv = "shift_id,date,start_time,end_time,requirements\n1,2026-08-01,09:00,17:00,nurses=1\n";
+    expect(assertCsvKind(csv, "staff")).toMatch(/looks like a shifts CSV/i);
+  });
+});
