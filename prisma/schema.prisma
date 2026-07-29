@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum AppRole {
+  MANAGER
+  STAFF
+}
+
+enum Profession {
+  DOCTOR
+  NURSE
+  RECEPTIONIST
+}
+
+model User {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  passwordHash  String
+  name          String
+  appRole       AppRole
+  profession    Profession?
+  legacyStaffId Int?        @unique
+  createdAt     DateTime    @default(now())
+  claims        Claim[]
+}
+
+model Shift {
+  id                    String   @id @default(cuid())
+  legacyShiftId         Int?     @unique
+  /// Calendar date of the shift start (YYYY-MM-DD stored as DateTime at UTC midnight)
+  date                  DateTime
+  /// Minutes from midnight for start
+  startMinutes          Int
+  /// Minutes from midnight for end (may be on the next calendar day)
+  endMinutes            Int
+  /// True when the shift crosses midnight
+  endsNextDay           Boolean  @default(false)
+  requiredDoctors       Int      @default(0)
+  requiredNurses        Int      @default(0)
+  requiredReceptionists Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  claims                Claim[]
+
+  @@index([date])
+}
+
+model Claim {
+  id        String   @id @default(cuid())
+  shiftId   String
+  userId    String
+  createdAt DateTime @default(now())
+  shift     Shift    @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([shiftId, userId])
+  @@index([userId])
+  @@index([shiftId])
+}
+
+model ImportReport {
+  id            String             @id @default(cuid())
+  source        String
+  filename      String
+  acceptedCount Int                @default(0)
+  rejectedCount Int                @default(0)
+  mergedCount   Int                @default(0)
+  createdAt     DateTime           @default(now())
+  items         ImportReportItem[]
+}
+
+model ImportReportItem {
+  id        String       @id @default(cuid())
+  reportId  String
+  kind      String
+  rowNumber Int
+  rawRow    String
+  issue     String
+  action    String
+  report    ImportReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+}
